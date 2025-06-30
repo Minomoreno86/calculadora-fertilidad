@@ -36,4 +36,8 @@ EXPOSE 8080
 # Le dice a Streamlit que se ejecute y que sea accesible desde cualquier dirección de red.
 # IMPORTANTE: Asegúrate de que "Calculadora.py" es el nombre de tu script principal.
 # Si tu script principal se llama, por ejemplo, "app.py", debes cambiarlo aquí.
-CMD ["streamlit", "run", "Calculadora.py", "--server.port=$PORT", "--server.enableCORS=false"]
+# ANTES (Forma Exec, que NO sustituye la variable $PORT)
+# CMD ["streamlit", "run", "Calculadora.py", "--server.port=$PORT", "--server.enableCORS=false"]
+
+# DESPUÉS (Forma Shell, que SÍ sustituye la variable $PORT)
+CMD streamlit run Calculadora.py --server.port=$PORT --server.enableCORS=false
