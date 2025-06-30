@@ -1,19 +1,33 @@
-# db_manager.py
+# db_manager.py - CÓDIGO COMPLETO Y CORREGIDO
+
 import sqlite3
 from datetime import datetime
 import pandas as pd
+import os # <-- ¡CAMBIO 1: AÑADIDO!
 
 def crear_conexion(db_file):
     """
-    Crea una conexión a la base de datos SQLite especificada por db_file.
+    Crea una conexión a la base de datos SQLite.
+    Si el archivo de la BBDD no existe, lo crea y también las tablas necesarias.
     """
+    # <-- ¡CAMBIO 2: LÓGICA COMPLETAMENTE REEMPLAZADA DENTRO DE ESTA FUNCIÓN!
+    # Comprobamos si el archivo de la base de datos ya existe ANTES de conectar.
+    db_existe = os.path.exists(db_file)
+    
     conn = None
     try:
+        # Creamos la conexión. SQLite creará el archivo .db si no existe.
         conn = sqlite3.connect(db_file)
+        
+        # Si la base de datos NO existía, llamamos a tu función para crear las tablas.
+        if not db_existe:
+            print(f"El archivo '{db_file}' no existía. Creando tablas...")
+            crear_tabla(conn) # Usamos tu función crear_tabla que ya es correcta.
+        
         return conn
     except sqlite3.Error as e:
         print(e)
-    return conn
+        return conn
 
 def crear_tabla(conn):
     """
@@ -71,7 +85,7 @@ def insertar_registro(conn, registro_data):
                 insulina_ayunas, glicemia_ayunas, volumen_seminal, 
                 concentracion_esperm, motilidad_progresiva, morfologia_normal, 
                 vitalidad_esperm, pronostico_final
-              ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
     try:
         cursor = conn.cursor()
         cursor.execute(sql, registro_data)
@@ -124,7 +138,6 @@ def main():
     database = "fertilidad.db"
     conn = crear_conexion(database)
     if conn is not None:
-        crear_tabla(conn)
         print("Base de datos y tabla verificadas.")
         conn.close()
     else:
