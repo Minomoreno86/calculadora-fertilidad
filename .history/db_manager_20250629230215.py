@@ -1,0 +1,30 @@
+import sqlite3; from datetime import datetime; import pandas as pd
+def crear_conexion(db_file):
+    conn = None;
+    try: conn = sqlite3.connect(db_file); return conn
+    except sqlite3.Error as e: print(e)
+    return conn
+def crear_tabla(conn):
+    sql_crear_tabla_registros = """ CREATE TABLE IF NOT EXISTS registros ( id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp TEXT NOT NULL, edad INTEGER, duracion_ciclo INTEGER, imc REAL, tiene_sop INTEGER, grado_endometriosis INTEGER, tiene_miomas INTEGER, mioma_submucoso INTEGER, mioma_intramural_significativo INTEGER, mioma_subseroso_grande INTEGER, amh REAL, prolactina REAL, tsh REAL, tpo_ab_positivo INTEGER, insulina_ayunas REAL, glicemia_ayunas REAL, concentracion_esperm REAL, motilidad_progresiva REAL, morfologia_normal REAL, vitalidad_esperm REAL, pronostico_final REAL ); """
+    try: cursor = conn.cursor(); cursor.execute(sql_crear_tabla_registros);
+    except sqlite3.Error as e: print(f"Error al crear la tabla: {e}")
+def insertar_registro(conn, registro_data):
+    sql = ''' INSERT INTO registros(timestamp, edad, duracion_ciclo, imc, tiene_sop, grado_endometriosis, tiene_miomas, mioma_submucoso, mioma_intramural_significativo, mioma_subseroso_grande, amh, prolactina, tsh, tpo_ab_positivo, insulina_ayunas, glicemia_ayunas, concentracion_esperm, motilidad_progresiva, morfologia_normal, vitalidad_esperm, pronostico_final) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+    try: cursor = conn.cursor(); cursor.execute(sql, registro_data); conn.commit(); return cursor.lastrowid
+    except sqlite3.Error as e: print(f"Error al insertar el registro: {e}"); return None
+def leer_todos_los_registros(conn):
+    try: df = pd.read_sql_query("SELECT * FROM registros", conn); return df
+    except Exception as e: print(f"Error al leer los registros: {e}"); return pd.DataFrame()
+def eliminar_registro_por_id(conn, id):
+    sql = 'DELETE FROM registros WHERE id = ?';
+    try: cursor = conn.cursor(); cursor.execute(sql, (id,)); conn.commit(); print(f"Registro con ID {id} eliminado con éxito.")
+    except sqlite3.Error as e: print(f"Error al eliminar el registro con ID {id}: {e}")
+def eliminar_todos_los_registros(conn):
+    sql = 'DELETE FROM registros';
+    try: cursor = conn.cursor(); cursor.execute(sql); conn.commit(); print("Todos los registros han sido eliminados.")
+    except sqlite3.Error as e: print(f"Error al eliminar todos los registros: {e}")
+def main():
+    database = "fertilidad.db"; conn = crear_conexion(database)
+    if conn is not None: crear_tabla(conn); print("Base de datos y tabla verificadas."); conn.close()
+    else: print("Error: No se pudo crear la conexión a la base de datos.")
+if __name__ == '__main__': main()
