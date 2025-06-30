@@ -1,43 +1,23 @@
-# Dockerfile para la Calculadora de Fertilidad
+# Dockerfile para la Calculadora de Fertilidad en Streamlit
 
-# Etapa 1: La Imagen Base
-# Usamos una imagen oficial de Python 3.11 en su versión "slim".
-# Esto nos da un sistema operativo Linux ligero con Python ya instalado y listo.
+# Etapa 1: Imagen base liviana
 FROM python:3.11-slim
 
-# Etapa 2: Establecer el Directorio de Trabajo
-# Creamos una carpeta llamada /app dentro del contenedor y nos movemos a ella.
-# Todos los comandos siguientes se ejecutarán desde esta carpeta.
+# Etapa 2: Directorio de trabajo
 WORKDIR /app
 
-# Etapa 3: Copiar e Instalar Dependencias
-# Copiamos PRIMERO el archivo de requerimientos. Esto es una optimización clave.
-# Docker guarda en caché los resultados de cada paso. Si no cambias tus
-# requerimientos, en futuras construcciones, Docker reutilizará la capa ya instalada,
-# haciendo el proceso mucho más rápido.
+# Etapa 3: Copiar dependencias y optimizar cache
 COPY requirements.txt .
 
-# Ejecutamos pip para instalar todas las librerías de nuestra lista.
-# --no-cache-dir ahorra espacio en la imagen final.
+# Etapa 4: Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Etapa 4: Copiar el Código de la Aplicación
-# Ahora, copiamos todo el resto de nuestro código (el primer '.')
-# al directorio de trabajo (/app) dentro del contenedor (el segundo '.').
+# Etapa 5: Copiar el código
 COPY . .
 
-# Etapa 5: Exponer el Puerto
-# Le decimos a Docker que nuestra aplicación Streamlit, dentro del contenedor,
-# escuchará en el puerto 8501.
+# Etapa 6: Exponer el puerto requerido por Cloud Run
 EXPOSE 8080
 
-# Etapa 6: El Comando de Ejecución
-# Este es el comando que se ejecutará automáticamente cuando el contenedor se inicie.
-# Le dice a Streamlit que se ejecute y que sea accesible desde cualquier dirección de red.
-# IMPORTANTE: Asegúrate de que "Calculadora.py" es el nombre de tu script principal.
-# Si tu script principal se llama, por ejemplo, "app.py", debes cambiarlo aquí.
-# ANTES (Forma Exec, que NO sustituye la variable $PORT)
-# CMD ["streamlit", "run", "Calculadora.py", "--server.port=$PORT", "--server.enableCORS=false"]
-
-# DESPUÉS (Forma Shell, que SÍ sustituye la variable $PORT)
-CMD streamlit run Calculadora.py --server.port=$PORT --server.enableCORS=false
+# Etapa 7: Configurar el comando de ejecución (correcto para variables de entorno)
+# Esta es la forma correcta que Cloud Run interpreta bien (forma exec)
+CMD ["streamlit", "run", "Calculadora.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.enableCORS=false"]
