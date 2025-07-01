@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud Run with Manual Approval and Rollback
+name: Deploy to Google Cloud Run with Rollback and Manual Approval
 
 on:
   push:
@@ -12,11 +12,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-      actions: 'write'  # Requerido para approvals y environments
-
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
-      url: https://console.cloud.google.com/run
+      actions: 'write'  # Requerido para aprobación manual
 
     steps:
       - name: Checkout repository
@@ -41,10 +37,17 @@ jobs:
             echo "SERVICE_NAME=calculadora-fertilidad-app-dev" >> $GITHUB_ENV
           fi
 
-      # 🔒 Aprobación manual nativa de GitHub (recomendada)
-      - name: Wait for manual approval (GitHub Environment)
+      # 🔒 Aprobación manual solo en producción
+      - name: Wait for manual approval
         if: github.ref == 'refs/heads/main'
-        run: echo "Waiting for manual approval in GitHub interface..."
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GH_PERSONAL_TOKEN }}
+          approvers: Minomoreno86
+          minimum-approvals: 1
+          issue-title: "Production deployment approval required"
+          issue-body: "Please approve this deployment to production."
+          exclude-workflow-initiator-as-approver: false
 
       - name: Deploy to Cloud Run
         id: deploy
@@ -62,4 +65,4 @@ jobs:
         if: failure()
         run: |
           echo "Deployment failed. Rolling back to previous revision..."
-          gcloud run services update-traffic $SERVICE_NAME --to-latest --region us-central1
+          gcloud run services update-traffic $SERVICE_NAME --to-latest
