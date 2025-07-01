@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-name:  Deploy to Google Cloud Run 🚀 (Multi-Ambiente)
-
-=======
 name: Deploy to Google Cloud Run with Manual Approval and Rollback
->>>>>>> 1920e9cba53f40c1c04cb1fd9ffd01a25394e9ee
 
 on:
   push:
@@ -37,21 +32,6 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-<<<<<<< HEAD
-      - name: Build and Deploy to Cloud Run (Develop)
-        if: github.ref == 'refs/heads/develop'
-        run: |-
-          gcloud run deploy calculadora-fertilidad-app-dev \
-            --source . \
-            --region us-central1 \
-            --platform managed \
-            --allow-unauthenticated \
-            --memory 512Mi \
-            --timeout 600
-
-      - name: Build and Deploy to Cloud Run (Main)
-        if: github.ref == 'refs/heads/main'
-=======
       - name: Set Cloud Run Service Name
         id: service-name
         run: |
@@ -69,7 +49,6 @@ jobs:
       - name: Deploy to Cloud Run
         id: deploy
         continue-on-error: true
->>>>>>> 1920e9cba53f40c1c04cb1fd9ffd01a25394e9ee
         run: |-
           gcloud run deploy $SERVICE_NAME \
             --source . \

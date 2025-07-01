@@ -1,0 +1,47 @@
+name: Deploy to Google Cloud Run (Multi-Environment)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Set Cloud Run Service Name
+        id: service-name
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "SERVICE_NAME=calculadora-fertilidad-app" >> $GITHUB_ENV
+          else
+            echo "SERVICE_NAME=calculadora-fertilidad-app-dev" >> $GITHUB_ENV
+          fi
+
+      - name: Build and Deploy to Cloud Run
+        run: |-
+          gcloud run deploy $SERVICE_NAME \
+            --source . \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --memory 512Mi \
+            --timeout 600
