@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-name:  Deploy to Google Cloud Run 🚀 (Multi-Ambiente)
-
-=======
-name: Deploy to Google Cloud Run with Manual Approval and Rollback
->>>>>>> 1920e9cba53f40c1c04cb1fd9ffd01a25394e9ee
+name: Deploy to Google Cloud Run 🚀
 
 on:
   push:
@@ -13,21 +8,18 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     permissions:
       contents: 'read'
       id-token: 'write'
-      actions: 'write'  # Requerido para approvals y environments
 
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
-      url: https://console.cloud.google.com/run
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - id: 'auth'
+      - name: Authenticate to Google Cloud
+        id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
@@ -37,50 +29,22 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-<<<<<<< HEAD
-      - name: Build and Deploy to Cloud Run (Develop)
-        if: github.ref == 'refs/heads/develop'
-        run: |-
-          gcloud run deploy calculadora-fertilidad-app-dev \
-            --source . \
-            --region us-central1 \
-            --platform managed \
-            --allow-unauthenticated \
-            --memory 512Mi \
-            --timeout 600
-
-      - name: Build and Deploy to Cloud Run (Main)
-        if: github.ref == 'refs/heads/main'
-=======
       - name: Set Cloud Run Service Name
         id: service-name
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          if [ "${{ github.ref_name }}" == "main" ]; then
             echo "SERVICE_NAME=calculadora-fertilidad-app" >> $GITHUB_ENV
           else
             echo "SERVICE_NAME=calculadora-fertilidad-app-dev" >> $GITHUB_ENV
           fi
 
-      # 🔒 Aprobación manual nativa de GitHub (recomendada)
-      - name: Wait for manual approval (GitHub Environment)
-        if: github.ref == 'refs/heads/main'
-        run: echo "Waiting for manual approval in GitHub interface..."
-
       - name: Deploy to Cloud Run
         id: deploy
-        continue-on-error: true
->>>>>>> 1920e9cba53f40c1c04cb1fd9ffd01a25394e9ee
         run: |-
-          gcloud run deploy $SERVICE_NAME \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
             --source . \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
             --memory 512Mi \
             --timeout 600
-
-      - name: Rollback if Deployment Fails
-        if: failure()
-        run: |
-          echo "Deployment failed. Rolling back to previous revision..."
-          gcloud run services update-traffic $SERVICE_NAME --to-latest --region us-central1
