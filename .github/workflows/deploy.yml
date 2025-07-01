@@ -1,9 +1,11 @@
-name: Deploy to Google Cloud Run
+name:  Deploy to Google Cloud Run 🚀 (Multi-Ambiente)
+
 
 on:
   push:
     branches:
       - main
+      - develop
 
 jobs:
   deploy:
@@ -27,7 +29,19 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Build and Deploy to Cloud Run
+      - name: Build and Deploy to Cloud Run (Develop)
+        if: github.ref == 'refs/heads/develop'
+        run: |-
+          gcloud run deploy calculadora-fertilidad-app-dev \
+            --source . \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --memory 512Mi \
+            --timeout 600
+
+      - name: Build and Deploy to Cloud Run (Main)
+        if: github.ref == 'refs/heads/main'
         run: |-
           gcloud run deploy calculadora-fertilidad-app \
             --source . \
