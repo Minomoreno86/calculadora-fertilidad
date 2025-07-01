@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud Run with Rollback
+name: Deploy to Google Cloud Run (Multi-Environment)
 
 on:
   push:
@@ -36,9 +36,7 @@ jobs:
             echo "SERVICE_NAME=calculadora-fertilidad-app-dev" >> $GITHUB_ENV
           fi
 
-      - name: Deploy to Cloud Run
-        id: deploy
-        continue-on-error: true
+      - name: Build and Deploy to Cloud Run
         run: |-
           gcloud run deploy $SERVICE_NAME \
             --source . \
@@ -47,9 +45,3 @@ jobs:
             --allow-unauthenticated \
             --memory 512Mi \
             --timeout 600
-
-      - name: Rollback if Deployment Fails
-        if: failure()
-        run: |
-          echo "Deployment failed. Rolling back to previous revision..."
-          gcloud run services update-traffic $SERVICE_NAME --to-latest
