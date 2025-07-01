@@ -139,7 +139,7 @@ with col2:
         delta=f"{pronostico_simulado_num - perfil_base['pronostico_final']:.1f}% vs. Original"
     )
     # --- COMPARACIÓN GRÁFICA ENTRE PERFIL ORIGINAL Y SIMULADO ---
-import plotly.graph_objects as go
+mport plotly.graph_objects as go
 
 st.divider()
 st.subheader("📊 Comparación Visual del Pronóstico")
