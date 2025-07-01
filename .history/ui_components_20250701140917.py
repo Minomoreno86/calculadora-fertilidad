@@ -108,110 +108,40 @@ def ui_historial_clinico():
             )
 
 def ui_laboratorio():
-    """
-    Dibuja la interfaz para el Perfil de Laboratorio con UX mejorada y validación inmediata.
-    """
-    st.markdown("#### Paso 3 de 4: Perfil de Laboratorio (Opcional)")
-    st.write("Si tienes resultados de análisis, puedes introducirlos aquí para un pronóstico más preciso.")
+    """Dibuja la interfaz de usuario para el Paso 3: Laboratorio."""
+    st.markdown("#### Paso 3 de 4: Perfil de Laboratorio")
+    with st.expander("Expandir para introducir Perfil Endocrino y Metabólico"):
+        st.checkbox("Incluir Nivel de AMH", key="use_amh", value=st.session_state.get("use_amh", False))
+        st.number_input("Nivel de AMH (ng/mL)", min_value=0.0, max_value=20.0, format="%.2f", key="amh", disabled=not st.session_state.get("use_amh"))
+        st.divider()
+        
+        st.checkbox("Incluir Nivel de Prolactina", key="use_prolactina", value=st.session_state.get("use_prolactina", False))
+        st.number_input("Nivel de Prolactina (ng/mL)", min_value=0.0, max_value=200.0, format="%.2f", key="prolactina", disabled=not st.session_state.get("use_prolactina"))
+        st.divider()
+        
+        st.checkbox("Incluir Función Tiroidea (TSH)", key="use_tsh", value=st.session_state.get("use_tsh", False))
+        st.number_input("Nivel de TSH (µUI/mL)", min_value=0.0, max_value=10.0, format="%.2f", key="tsh", disabled=not st.session_state.get("use_tsh"))
+        if st.session_state.get("use_tsh") and st.session_state.get("tsh", 0) > 2.5:
+            st.radio("¿Anticuerpos TPO positivos?", ["No", "Sí"], key="tpo_radio", help="Este campo solo es relevante si TSH > 2.5")
+        st.divider()
+        
+        st.checkbox("Incluir Índice HOMA (Resistencia a Insulina)", key="use_homa", value=st.session_state.get("use_homa", False))
+        st.number_input("Insulina en ayunas (μU/mL)", min_value=1.0, max_value=50.0, format="%.2f", key="insulina_ayunas", disabled=not st.session_state.get("use_homa"))
+        st.number_input("Glicemia en ayunas (mg/dL)", min_value=50.0, max_value=200.0, format="%.1f", key="glicemia_ayunas", disabled=not st.session_state.get("use_homa"))
     st.divider()
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        # --- Hormona Antimülleriana (AMH) ---
-        use_amh = st.toggle("Introducir Nivel de AMH", key="use_amh")
-        if use_amh:
-            amh_level = st.number_input("Nivel de AMH (ng/mL)", min_value=0.0, max_value=20.0, format="%.2f", key="amh")
-            if amh_level < 1.0:
-                st.warning("⚠️ AMH baja, sugiere una reserva ovárica disminuida.")
-            elif amh_level > 3.0:
-                st.info("💡 AMH alta, puede ser sugestivo de SOP.")
-            else:
-                st.success("✅ Nivel de AMH en un rango adecuado.")
-
-        # --- Prolactina ---
-        use_prolactina = st.toggle("Introducir Nivel de Prolactina", key="use_prolactina")
-        if use_prolactina:
-            prolactina_level = st.number_input("Nivel de Prolactina (ng/mL)", min_value=0.0, max_value=200.0, format="%.1f", key="prolactina")
-            if prolactina_level >= 25:
-                st.warning("⚠️ Nivel de Prolactina elevado (Hiperprolactinemia).")
-            else:
-                st.success("✅ Nivel de Prolactina normal.")
-
-    with col2:
-        # --- Función Tiroidea (TSH) ---
-        use_tsh = st.toggle("Introducir Función Tiroidea (TSH)", key="use_tsh")
-        if use_tsh:
-            tsh_level = st.number_input("Nivel de TSH (µUI/mL)", min_value=0.0, max_value=10.0, format="%.2f", key="tsh")
-            if tsh_level > 2.5:
-                st.warning("⚠️ TSH por encima del nivel óptimo para fertilidad (>2.5).")
-                # Esta sub-opción solo aparece si es relevante
-                st.toggle("¿Anticuerpos TPO positivos?", key="tpo_ab_positivo")
-            else:
-                st.success("✅ Nivel de TSH óptimo.")
-
-        # --- Resistencia a la Insulina (HOMA) ---
-        use_homa = st.toggle("Introducir Índice HOMA (Insulina/Glicemia)", key="use_homa")
-        if use_homa:
-            insulina = st.number_input("Insulina en ayunas (μU/mL)", min_value=1.0, max_value=50.0, format="%.2f", key="insulina_ayunas")
-            glicemia = st.number_input("Glicemia en ayunas (mg/dL)", min_value=50.0, max_value=200.0, format="%.1f", key="glicemia_ayunas")
-
-            # Validamos y calculamos el índice HOMA en tiempo real
-            if insulina > 1 and glicemia > 50:
-                homa_calculado = (insulina * glicemia) / 405
-                if homa_calculado >= 2.5:
-                    st.warning(f"**Índice HOMA: {homa_calculado:.2f}**. Sugiere Resistencia a la Insulina.")
-                else:
-                    st.success(f"**Índice HOMA: {homa_calculado:.2f}**. Normal.")
 
 def ui_factor_masculino():
-    """
-    Dibuja la interfaz para el Factor Masculino con UX mejorada y validación inmediata.
-    """
-    st.markdown("#### Paso 4 de 4: Factor Masculino (Opcional)")
-    st.write("Si se dispone de un espermatograma, introduce aquí los resultados.")
+    """Dibuja la interfaz de usuario para el Paso 4: Factor Masculino."""
+    st.markdown("#### Paso 4 de 4: Factor Masculino")
+    st.checkbox("Incluir análisis de espermatograma", key="use_esperma", value=st.session_state.get("use_esperma", False))
+    with st.expander("Expandir para introducir Detalle del Espermatograma"):
+        is_disabled = not st.session_state.get("use_esperma")
+        st.number_input("Volumen (mL)", min_value=0.0, max_value=10.0, format="%.2f", key="volumen_seminal", disabled=is_disabled)
+        st.number_input("Concentración (millones/mL)", min_value=0.0, max_value=200.0, format="%.2f", key="concentracion_esperm", disabled=is_disabled)
+        st.number_input("Motilidad progresiva (%)", min_value=0, max_value=100, key="motilidad_progresiva", disabled=is_disabled)
+        st.number_input("Morfología normal (%)", min_value=0, max_value=100, key="morfologia_normal", disabled=is_disabled)
+        st.number_input("Vitalidad (%)", min_value=0, max_value=100, key="vitalidad_esperm", disabled=is_disabled)
     st.divider()
-
-    use_esperma = st.toggle("Incluir análisis de espermatograma", key="use_esperma")
-    if use_esperma:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # --- Volumen Seminal ---
-            volumen = st.number_input("Volumen (mL)", min_value=0.0, max_value=10.0, format="%.2f", key="volumen_seminal")
-            if volumen < 1.4:
-                st.warning("⚠️ Volumen por debajo del límite de referencia (>1.4 mL).")
-            else:
-                st.success("✅ Volumen normal.")
-
-            # --- Concentración Espermática ---
-            concentracion = st.number_input("Concentración (millones/mL)", min_value=0.0, max_value=200.0, format="%.1f", key="concentracion_esperm")
-            if concentracion < 16:
-                st.warning("⚠️ Concentración por debajo del límite de referencia (>16 M/mL).")
-            else:
-                st.success("✅ Concentración normal.")
-
-            # --- Morfología Normal ---
-            morfologia = st.number_input("Morfología normal (%)", min_value=0, max_value=100, key="morfologia_normal")
-            if morfologia < 4:
-                st.warning("⚠️ Morfología por debajo del límite de referencia (>4%).")
-            else:
-                st.success("✅ Morfología normal.")
-
-        with col2:
-            # --- Motilidad Progresiva ---
-            motilidad = st.number_input("Motilidad progresiva (%)", min_value=0, max_value=100, key="motilidad_progresiva")
-            if motilidad < 32:
-                st.warning("⚠️ Motilidad progresiva por debajo del límite de referencia (>30%).")
-            else:
-                st.success("✅ Motilidad progresiva normal.")
-
-            # --- Vitalidad Espermática ---
-            vitalidad = st.number_input("Vitalidad (%)", min_value=0, max_value=100, key="vitalidad_esperm")
-            if vitalidad < 58:
-                st.warning("⚠️ Vitalidad por debajo del límite de referencia (>54%).")
-            else:
-                st.success("✅ Vitalidad normal.")
 
 def mostrar_informe_completo(evaluacion):
     """Dibuja el informe completo y dinámico en la página."""
