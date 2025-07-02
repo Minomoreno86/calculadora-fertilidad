@@ -79,15 +79,15 @@ def insertar_registro(conn, registro_data):
     """
     # El comando INSERT ahora incluye la nueva columna
     sql = ''' INSERT INTO registros(
-    timestamp, edad, duracion_ciclo, imc, tiene_sop, 
-    grado_endometriosis, tiene_miomas, mioma_submucoso, 
-    mioma_submucoso_multiple, mioma_intramural_significativo, 
-    mioma_subseroso_grande, tipo_adenomiosis, tipo_polipo, 
-    resultado_hsg, amh, prolactina, tsh, tpo_ab_positivo, 
-    insulina_ayunas, glicemia_ayunas, volumen_seminal, 
-    concentracion_esperm, motilidad_progresiva, morfologia_normal, 
-    vitalidad_esperm, pronostico_final, tema
-) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+                timestamp, edad, duracion_ciclo, imc, tiene_sop, 
+                grado_endometriosis, tiene_miomas, mioma_submucoso, 
+                mioma_submucoso_multiple, mioma_intramural_significativo, 
+                mioma_subseroso_grande, tipo_adenomiosis, tipo_polipo, 
+                resultado_hsg, amh, prolactina, tsh, tpo_ab_positivo, 
+                insulina_ayunas, glicemia_ayunas, volumen_seminal, 
+                concentracion_esperm, motilidad_progresiva, morfologia_normal, 
+                vitalidad_esperm, pronostico_final, tema
+            ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
     try:
         cursor = conn.cursor()
         cursor.execute(sql, registro_data)

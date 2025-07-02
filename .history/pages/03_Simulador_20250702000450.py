@@ -7,10 +7,7 @@ import numpy as np
 from db_manager import crear_conexion, leer_todos_los_registros
 from calculadora_fertilidad import EvaluacionFertilidad
 from config import SIMULATABLE_VARIABLES
-from ui_components import aplicar_tema_personalizado
-aplicar_tema_personalizado()
 
-    
 st.set_page_config(page_title="Simulador de Escenarios", page_icon="🧪", layout="wide")
 st.title("🧪 Simulador de Escenarios: ¿Qué Pasa Si...?")
 st.write(
@@ -42,9 +39,10 @@ registro_seleccionado_str = st.selectbox("Selecciona tu perfil base:", opciones_
 if 'registro_id_seleccionado' not in st.session_state or st.session_state.registro_id_seleccionado != registro_seleccionado_str:
     st.session_state.registro_id_seleccionado = registro_seleccionado_str
     st.session_state.variables_a_simular = [] 
+
 registro_id = int(registro_seleccionado_str.split(" ")[1])
 perfil_base = df_registros[df_registros['id'] == registro_id].iloc[0]
-
+st.session_state['tema'] = perfil_base.get('tema', 'light')
 # --- 3. Selección Dinámica de Variables a Simular ---
 st.divider()
 st.markdown("### Selecciona los Factores a Simular")
@@ -237,10 +235,7 @@ if st.button("Guardar este Escenario Simulado como Nuevo Perfil"):
             datos_simulados.get('motilidad_progresiva', perfil_base['motilidad_progresiva']),
             datos_simulados.get('morfologia_normal', perfil_base['morfologia_normal']),
             datos_simulados.get('vitalidad_esperm', perfil_base['vitalidad_esperm']),
-            pronostico_num,
-            st.session_state.get('tema', 'light')
-
-            
+            pronostico_num
         )
 
         registro_id = insertar_registro(conn, registro_simulado)

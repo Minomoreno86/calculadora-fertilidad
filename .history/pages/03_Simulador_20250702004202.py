@@ -238,8 +238,6 @@ if st.button("Guardar este Escenario Simulado como Nuevo Perfil"):
             datos_simulados.get('morfologia_normal', perfil_base['morfologia_normal']),
             datos_simulados.get('vitalidad_esperm', perfil_base['vitalidad_esperm']),
             pronostico_num,
-            st.session_state.get('tema', 'light')
-
             
         )
 

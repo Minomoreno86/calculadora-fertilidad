@@ -13,7 +13,7 @@ st.title("🎯 Calculadora Profesional de Fertilidad 👶")
 st.markdown("## Evalúa tu pronóstico de fertilidad de manera moderna, visual y personalizada.")
 # Selector de tema dinámico
 st.selectbox(
-    "🎨 Selecciona el tema de visualización:",
+    "Selecciona el tema de visualización:",
     ["light", "dark", "blue", "pink"],
     key="tema"
 )

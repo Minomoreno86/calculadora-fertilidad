@@ -13,7 +13,7 @@ st.title("🎯 Calculadora Profesional de Fertilidad 👶")
 st.markdown("## Evalúa tu pronóstico de fertilidad de manera moderna, visual y personalizada.")
 # Selector de tema dinámico
 st.selectbox(
-    "🎨 Selecciona el tema de visualización:",
+    "Selecciona el tema de visualización:",
     ["light", "dark", "blue", "pink"],
     key="tema"
 )
@@ -102,21 +102,14 @@ if st.button("Generar Informe de Fertilidad Completo", type="primary", use_conta
 if 'evaluacion_actual' in st.session_state and st.session_state.evaluacion_actual is not None:
     # Esta llamada no se modifica, usará tu función completa y correcta del informe.
     mostrar_informe_completo(st.session_state.evaluacion_actual)
-
-# Lógica del botón de guardar
-if st.button("💾 Guardar este Perfil y Resultado", use_container_width=True, key="guardar_informe"):
-    conn = crear_conexion("fertilidad.db")
-    if conn is not None:
-        try:
+    
+    # Lógica del botón de guardar
+    if st.button("💾 Guardar este Perfil y Resultado", use_container_width=True, key="guardar_informe"):
+        conn = crear_conexion("fertilidad.db")
+        if conn is not None:
             registro_db = preparar_registro_db(st.session_state.evaluacion_actual)
-            resultado = insertar_registro(conn, registro_db)
+            insertar_registro(conn, registro_db)
             conn.close()
-            if resultado:
-                st.toast('¡Perfil guardado en la base de datos!', icon='✅')
-            else:
-                st.error("No se pudo guardar el perfil en la base de datos.")
-        except Exception as e:
-            st.error(f"Error al guardar: {e}")
-            conn.close()
-    else:
-        st.error("No se pudo conectar a la base de datos para guardar.")
+            st.toast('¡Perfil guardado en la base de datos!', icon='✅')
+        else:
+            st.error("No se pudo conectar a la base de datos para guardar.")

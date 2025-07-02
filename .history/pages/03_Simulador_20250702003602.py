@@ -7,10 +7,7 @@ import numpy as np
 from db_manager import crear_conexion, leer_todos_los_registros
 from calculadora_fertilidad import EvaluacionFertilidad
 from config import SIMULATABLE_VARIABLES
-from ui_components import aplicar_tema_personalizado
-aplicar_tema_personalizado()
 
-    
 st.set_page_config(page_title="Simulador de Escenarios", page_icon="🧪", layout="wide")
 st.title("🧪 Simulador de Escenarios: ¿Qué Pasa Si...?")
 st.write(
@@ -239,8 +236,6 @@ if st.button("Guardar este Escenario Simulado como Nuevo Perfil"):
             datos_simulados.get('vitalidad_esperm', perfil_base['vitalidad_esperm']),
             pronostico_num,
             st.session_state.get('tema', 'light')
-
-            
         )
 
         registro_id = insertar_registro(conn, registro_simulado)

@@ -13,7 +13,7 @@ st.title("🎯 Calculadora Profesional de Fertilidad 👶")
 st.markdown("## Evalúa tu pronóstico de fertilidad de manera moderna, visual y personalizada.")
 # Selector de tema dinámico
 st.selectbox(
-    "🎨 Selecciona el tema de visualización:",
+    "Selecciona el tema de visualización:",
     ["light", "dark", "blue", "pink"],
     key="tema"
 )
@@ -107,16 +107,12 @@ if 'evaluacion_actual' in st.session_state and st.session_state.evaluacion_actua
 if st.button("💾 Guardar este Perfil y Resultado", use_container_width=True, key="guardar_informe"):
     conn = crear_conexion("fertilidad.db")
     if conn is not None:
-        try:
-            registro_db = preparar_registro_db(st.session_state.evaluacion_actual)
-            resultado = insertar_registro(conn, registro_db)
-            conn.close()
-            if resultado:
-                st.toast('¡Perfil guardado en la base de datos!', icon='✅')
-            else:
-                st.error("No se pudo guardar el perfil en la base de datos.")
-        except Exception as e:
-            st.error(f"Error al guardar: {e}")
-            conn.close()
+        registro_db = preparar_registro_db(st.session_state.evaluacion_actual)
+        resultado = insertar_registro(conn, registro_db)
+        conn.close()
+        if resultado:
+            st.toast('¡Perfil guardado en la base de datos!', icon='✅')
+        else:
+            st.error("No se pudo guardar el perfil en la base de datos.")
     else:
         st.error("No se pudo conectar a la base de datos para guardar.")
