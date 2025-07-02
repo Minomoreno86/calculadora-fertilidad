@@ -9,33 +9,27 @@ import streamlit as st
 def crear_conexion(db_file):
     """
     Crea una conexión a la base de datos SQLite.
-    Si el archivo no existe, lo crea y también las tablas necesarias.
-    Si el archivo ya existe, verifica que las tablas estén completas.
+    Si el archivo de la BBDD no existe, lo crea y también las tablas necesarias.
     """
-    import sqlite3
-    import os
+    # <-- ¡CAMBIO 2: LÓGICA COMPLETAMENTE REEMPLAZADA DENTRO DE ESTA FUNCIÓN!
+    # Comprobamos si el archivo de la base de datos ya existe ANTES de conectar.
     db_existe = os.path.exists(db_file)
     
     conn = None
     try:
+        # Creamos la conexión. SQLite creará el archivo .db si no existe.
         conn = sqlite3.connect(db_file)
+        
+        # Si la base de datos NO existía, llamamos a tu función para crear las tablas.
         if not db_existe:
-            crear_tabla(conn)
-            crear_tabla_logros(conn)
-            inicializar_logros(conn)
-        else:
-            # 👇 Verificar si la tabla logros existe aunque la base ya exista
-            cursor = conn.cursor()
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='logros'")
-            tabla_logros = cursor.fetchone()
-            if not tabla_logros:
-                crear_tabla_logros(conn)
-                inicializar_logros(conn)
+            print(f"El archivo '{db_file}' no existía. Creando tablas...")
+            crear_tabla(conn) # Usamos tu función crear_tabla que ya es correcta.
         
         return conn
     except sqlite3.Error as e:
         print(e)
         return conn
+
 def crear_tabla(conn):
     """
     Crea la tabla 'registros' si no existe, con todas las columnas necesarias.

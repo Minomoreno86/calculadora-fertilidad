@@ -104,26 +104,26 @@ if 'evaluacion_actual' in st.session_state and st.session_state.evaluacion_actua
     mostrar_informe_completo(st.session_state.evaluacion_actual)
 
 # Lógica del botón de guardar
-if st.button("💾 Guardar este Perfil y Resultado", use_container_width=True, key="guardar_informe"):
-    if st.session_state.evaluacion_actual is not None:
-        conn = crear_conexion("fertilidad.db")
-        if conn is not None:
-            try:
-                registro_db = preparar_registro_db(st.session_state.evaluacion_actual)
-                resultado = insertar_registro(conn, registro_db)
-                
-                if resultado:
-                    desbloquear_logro(conn, "Primer Informe")
-                    st.toast('¡Perfil guardado en la base de datos!', icon='✅')
-                else:
-                    st.error("No se pudo guardar el perfil en la base de datos.")
-                
-                conn.close()
-            except Exception as e:
-                st.error(f"Error al guardar: {e}")
-                conn.close()
-    else:
-        st.warning("⚠️ Debes generar primero un informe antes de poder guardarlo.")
+if st.session_state.evaluacion_actual is not None:
+    conn = crear_conexion("fertilidad.db")
+    if conn is not None:
+        try:
+            registro_db = preparar_registro_db(st.session_state.evaluacion_actual)
+            resultado = insertar_registro(conn, registro_db)
+            
+            if resultado:
+                desbloquear_logro(conn, "Primer Informe")
+                st.toast('¡Perfil guardado en la base de datos!', icon='✅')
+            else:
+                st.error("No se pudo guardar el perfil en la base de datos.")
+            
+            conn.close()
+        except Exception as e:
+            st.error(f"Error al guardar: {e}")
+            conn.close()
+else:
+    st.warning("Primero debes generar un informe antes de poder guardarlo.")
+
     st.divider()
 st.subheader("🏅 Tus Logros")
 
