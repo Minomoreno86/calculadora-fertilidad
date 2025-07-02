@@ -185,19 +185,6 @@ def leer_todos_los_registros(conn):
         print(f"Error al leer los registros: {e}")
         return pd.DataFrame()
 
-
-def leer_todos_los_riesgos(conn):
-    """
-    Lee todos los registros de riesgo de aborto de la base de datos.
-    """
-    try:
-        df = pd.read_sql_query("SELECT * FROM riesgo_aborto", conn)
-        return df
-    except Exception as e:
-        print(f"Error al leer los riesgos: {e}")
-        return pd.DataFrame()
-
-
 def eliminar_registro_por_id(conn, id):
     """
     Elimina un registro específico por su ID.
@@ -209,6 +196,7 @@ def eliminar_registro_por_id(conn, id):
         conn.commit()
     except sqlite3.Error as e:
         print(f"Error al eliminar el registro con ID {id}: {e}")
+
 def eliminar_todos_los_registros(conn):
     """
     Elimina TODOS los registros de la tabla.

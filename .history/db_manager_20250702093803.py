@@ -155,25 +155,6 @@ def insertar_registro(conn, registro_data):
         return cursor.lastrowid
     except Exception as e:
         raise e  # 👈 Este cambio es obligatorio
-
-def insertar_riesgo_aborto(conn, datos):
-    """
-    Inserta un nuevo registro en la tabla 'riesgo_aborto'.
-    """
-    sql = ''' INSERT INTO riesgo_aborto(
-        timestamp, edad, imc, abortos_previos, tiene_miomas, tiene_adenomiosis,
-        tiene_sop, tiene_diabetes, tiene_tiroides, prolactina_alta, infecciones_previas,
-        calidad_semen_alterada, riesgo_final, categoria
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
-    
-    try:
-        cursor = conn.cursor()
-        cursor.execute(sql, datos)
-        conn.commit()
-        return cursor.lastrowid
-    except Exception as e:
-        raise e
-
 def leer_todos_los_registros(conn):
     """
     Lee todos los registros de la base de datos y los devuelve como un DataFrame de Pandas.
@@ -184,19 +165,6 @@ def leer_todos_los_registros(conn):
     except Exception as e:
         print(f"Error al leer los registros: {e}")
         return pd.DataFrame()
-
-
-def leer_todos_los_riesgos(conn):
-    """
-    Lee todos los registros de riesgo de aborto de la base de datos.
-    """
-    try:
-        df = pd.read_sql_query("SELECT * FROM riesgo_aborto", conn)
-        return df
-    except Exception as e:
-        print(f"Error al leer los riesgos: {e}")
-        return pd.DataFrame()
-
 
 def eliminar_registro_por_id(conn, id):
     """
@@ -209,6 +177,7 @@ def eliminar_registro_por_id(conn, id):
         conn.commit()
     except sqlite3.Error as e:
         print(f"Error al eliminar el registro con ID {id}: {e}")
+
 def eliminar_todos_los_registros(conn):
     """
     Elimina TODOS los registros de la tabla.
