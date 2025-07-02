@@ -7,54 +7,6 @@ import plotly.graph_objects as go
 # --- IMPORTACIÓN CLAVE QUE RESUELVE EL ERROR ---
 from utils import create_sharable_image
 import urllib.parse
-def aplicar_tema_personalizado():
-    tema = st.session_state.get('tema', 'light')
-
-    if tema == 'light':
-        css = """
-        <style>
-        .stApp {
-            background-color: #f9f9f9;
-            color: #000000;
-        }
-        div.stButton > button:first-child {
-            background-color: #00CC96;
-            color: white;
-            height: 50px;
-            width: 100%;
-            border-radius: 10px;
-            font-size: 18px;
-        }
-        .stProgress > div > div > div > div {
-            border-radius: 10px;
-            height: 25px;
-        }
-        </style>
-        """
-    else:
-        css = """
-        <style>
-        .stApp {
-            background-color: #1E2A47;
-            color: #FFFFFF;
-        }
-        div.stButton > button:first-child {
-            background-color: #FECB52;
-            color: black;
-            height: 50px;
-            width: 100%;
-            border-radius: 10px;
-            font-size: 18px;
-        }
-        .stProgress > div > div > div > div {
-            border-radius: 10px;
-            height: 25px;
-        }
-        </style>
-        """
-
-    st.markdown(css, unsafe_allow_html=True)
-
 # --- FUNCIONES DE LA INTERFAZ DE USUARIO (PASOS) ---
 def ui_perfil_basico():
     """Dibuja la interfaz para el Perfil Básico con validación y UX mejorada."""

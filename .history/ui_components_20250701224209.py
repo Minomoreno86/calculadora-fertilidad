@@ -1,63 +1,12 @@
+# ui_components.py
 import streamlit as st
-import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
+import pandas as pd  # <-- LA IMPORTACIÓN QUE FALTABA
 
-
-# --- IMPORTACIÓN CLAVE QUE RESUELVE EL ERROR ---
-from utils import create_sharable_image
-import urllib.parse
-def aplicar_tema_personalizado():
-    tema = st.session_state.get('tema', 'light')
-
-    if tema == 'light':
-        css = """
-        <style>
-        .stApp {
-            background-color: #f9f9f9;
-            color: #000000;
-        }
-        div.stButton > button:first-child {
-            background-color: #00CC96;
-            color: white;
-            height: 50px;
-            width: 100%;
-            border-radius: 10px;
-            font-size: 18px;
-        }
-        .stProgress > div > div > div > div {
-            border-radius: 10px;
-            height: 25px;
-        }
-        </style>
-        """
-    else:
-        css = """
-        <style>
-        .stApp {
-            background-color: #1E2A47;
-            color: #FFFFFF;
-        }
-        div.stButton > button:first-child {
-            background-color: #FECB52;
-            color: black;
-            height: 50px;
-            width: 100%;
-            border-radius: 10px;
-            font-size: 18px;
-        }
-        .stProgress > div > div > div > div {
-            border-radius: 10px;
-            height: 25px;
-        }
-        </style>
-        """
-
-    st.markdown(css, unsafe_allow_html=True)
-
-# --- FUNCIONES DE LA INTERFAZ DE USUARIO (PASOS) ---
 def ui_perfil_basico():
-    """Dibuja la interfaz para el Perfil Básico con validación y UX mejorada."""
+    """Dibuja la interfaz de usuario para el Perfil Básico con validación y UX mejorada."""
+    st.markdown("#### Paso 1 de 4: Perfil Básico")
+
     # --- Edad con validación inmediata y contextual ---
     edad_usuario = st.number_input(
         "Tu edad",
@@ -71,30 +20,31 @@ def ui_perfil_basico():
 
     # --- Duración del ciclo con feedback instantáneo ---
     duracion_usuario = st.number_input(
-        "Duración promedio de tu ciclo menstrual (días)",
+        "Duración promedio de tu ciclo menstrual",
         min_value=15, max_value=90, key="duracion_ciclo",
         help="Un ciclo regular y ovulatorio suele durar entre 21 y 35 días."
     )
-    if duracion_usuario > 0 and not 21 <= duracion_usuario <= 35:
+    if not 21 <= duracion_usuario <= 35:
         st.warning(f"Un ciclo de {duracion_usuario} días se considera irregular y merece estudio.")
-    elif 21 <= duracion_usuario <= 35:
-        st.success(f"Un ciclo de {duracion_usuario} días está dentro del rango normal. ¡Bien!")
+    else:
+        st.success(f"Un ciclo de {duracion_usuario} días se considera dentro del rango normal. ¡Bien!")
 
-    # --- Cálculo de IMC con feedback instantáneo ---
+    # --- Cálculo de IMC ---
     st.markdown("**Cálculo Automático de IMC**")
-    peso = st.number_input("Peso (kg)", min_value=30.0, format="%.1f", key="peso")
-    talla = st.number_input("Talla (m)", min_value=1.0, format="%.2f", key="talla")
+    peso = st.number_input("Peso (kg)", min_value=30.0, max_value=200.0, value=65.0, format="%.1f")
+    talla = st.number_input("Talla (m)", min_value=1.0, max_value=2.5, value=1.65, format="%.2f")
+
     if talla > 0:
-        imc_calculado = round(peso / (talla ** 2), 2)
+        imc_calculado = peso / (talla ** 2)
         st.session_state.imc = imc_calculado
-        
         if imc_calculado < 18.5:
             st.error(f"**IMC: {imc_calculado:.1f} (Bajo Peso).** Esto puede afectar la ovulación.")
         elif 18.5 <= imc_calculado < 25:
             st.success(f"**IMC: {imc_calculado:.1f} (Peso Normal).** ¡Excelente!")
         else: # IMC >= 25
-            st.warning(f"**IMC: {imc_calculado:.1f} (Sobrepeso/Obesidad).** Esto puede afectar la calidad ovocitaria.")
-
+            st.warning(f"**IMC: {imc_calculado:.1f} (Sobrepeso/Obesidad).** Esto puede afectar la calidad ovocitaria y la respuesta a tratamientos.")
+    else:
+        st.session_state.imc = 0.0
 
 def ui_historial_clinico():
     """
@@ -156,6 +106,7 @@ def ui_historial_clinico():
                 key="resultado_hsg",
                 format_func=lambda x: {"normal": "Normal (Ambas trompas permeables)", "unilateral": "Obstrucción Unilateral", "bilateral": "Obstrucción Bilateral", "defecto_uterino": "Defecto en la cavidad uterina"}.get(x) if x else "Selecciona un resultado"
             )
+
 def ui_laboratorio():
     """
     Dibuja la interfaz para el Perfil de Laboratorio con UX mejorada y validación inmediata.
@@ -208,10 +159,11 @@ def ui_laboratorio():
             # Validamos y calculamos el índice HOMA en tiempo real
             if insulina > 1 and glicemia > 50:
                 homa_calculado = (insulina * glicemia) / 405
-                if homa_calculado >= 3.5:
+                if homa_calculado >= 2.5:
                     st.warning(f"**Índice HOMA: {homa_calculado:.2f}**. Sugiere Resistencia a la Insulina.")
                 else:
                     st.success(f"**Índice HOMA: {homa_calculado:.2f}**. Normal.")
+
 def ui_factor_masculino():
     """
     Dibuja la interfaz para el Factor Masculino con UX mejorada y validación inmediata.
@@ -260,48 +212,26 @@ def ui_factor_masculino():
                 st.warning("⚠️ Vitalidad por debajo del límite de referencia (>54%).")
             else:
                 st.success("✅ Vitalidad normal.")
-# --- FUNCIONES DE VISUALIZACIÓN DEL INFORME ---
-
-def display_main_score(value):
-    """Muestra el resultado principal con un marcador y una barra de progreso de color dinámico."""
-    st.header("📊 Tu Pronóstico de un Vistazo")
-    if value < 5: color, performance_text = "#EF553B", "Bajo"
-    elif value < 15: color, performance_text = "#FECB52", "Moderado"
-    else: color, performance_text = "#00CC96", "Bueno"
-        
-    st.markdown(f"""<style>.stProgress > div > div > div > div {{background-color: {color};}}</style>""", unsafe_allow_html=True)
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.metric(label="Pronóstico por Ciclo", value=f"{value:.1f} %")
-    with col2:
-        st.progress(value / 25)
-        st.write(f"**Evaluación:** Un pronóstico considerado **{performance_text}**.")
 
 def mostrar_informe_completo(evaluacion):
-    # --- 1. Marcador Visual Principal ---
-    display_main_score(evaluacion.pronostico_numerico)
-    st.divider()
-
-    # --- 2. Resumen del Pronóstico ---
-    st.header("📋 Análisis Detallado del Informe")
+    """Dibuja el informe completo y dinámico en la página."""
+    st.header("📋 Tu Informe de Fertilidad Personalizado")
     st.subheader(f"1. {evaluacion.pronostico_emoji} Tu Pronóstico General es: **{evaluacion.pronostico_categoria}**")
-
+    
     if evaluacion.pronostico_categoria == "BUENO":
         st.success(evaluacion.pronostico_frase)
-        st.balloons()
-
     elif evaluacion.pronostico_categoria == "MODERADO":
         st.warning(evaluacion.pronostico_frase)
     else:
         st.error(evaluacion.pronostico_frase)
 
     st.metric(label="PROBABILIDAD AJUSTADA DE CONCEPCIÓN POR CICLO", value=evaluacion.probabilidad_ajustada_final, delta=f"Basal por edad: {evaluacion.probabilidad_base_edad_num}%", delta_color="off")
-
+    
     if evaluacion.benchmark_frase:
         st.info(f"💡 **Contexto Poblacional:** {evaluacion.benchmark_frase}")
+        
     st.divider()
-
-    # --- 3. Desglose Detallado de Factores ---
+    
     st.subheader("2. Análisis Detallado y Recomendaciones")
     with st.expander("🔬 Ver desglose de factores evaluados", expanded=True):
         col1, col2, col3 = st.columns(3)
@@ -327,11 +257,11 @@ def mostrar_informe_completo(evaluacion):
             st.info("Factor Masculino")
             st.write(f"* **Espermatograma:** {evaluacion.diagnostico_masculino_detallado or 'No reportado'}")
 
-    # --- 4. Recomendaciones y Recursos ---
     if evaluacion.insights_clinicos:
-        with st.expander("💎 Perlas de Sabiduría Clínica Personalizadas"):
-            for insight in evaluacion.insights_clinicos:
-                st.info(f"🧠 {insight}")
+        st.subheader("💎 Perlas de Sabiduría Clínica Personalizadas")
+        st.write("Basado en los datos que proporcionaste, aquí tienes información clave extraída de la evidencia científica:")
+        for insight in evaluacion.insights_clinicos:
+            st.info(f"🧠 {insight}")
 
     if evaluacion.recomendaciones_lista:
         with st.expander("💡 Ver plan de acción y recomendaciones sugeridas"):
@@ -339,49 +269,26 @@ def mostrar_informe_completo(evaluacion):
             for rec in recomendaciones_unicas:
                 st.warning(f"• {rec}")
 
+    with st.expander("📊 Ver comparativa visual del pronóstico"):
+        prob_basal = evaluacion.probabilidad_base_edad_num
+        try:
+            prob_final = float(evaluacion.probabilidad_ajustada_final.replace('%', ''))
+            df_probs = pd.DataFrame({
+                'Tipo de Pronóstico': ['Probabilidad Basal (solo por edad)', 'Pronóstico Ajustado (todos los factores)'],
+                'Probabilidad (%)': [prob_basal, prob_final]
+            })
+            fig = px.bar(df_probs, x='Tipo de Pronóstico', y='Probabilidad (%)', text_auto='.1f', title="Comparativa de Probabilidad de Concepción por Ciclo", color='Tipo de Pronóstico', color_discrete_map={'Probabilidad Basal (solo por edad)': 'royalblue', 'Pronóstico Ajustado (todos los factores)': 'lightcoral'})
+            fig.update_layout(yaxis_title="Probabilidad de Embarazo (%)", xaxis_title="")
+            st.plotly_chart(fig, use_container_width=True)
+        except (ValueError, TypeError):
+            st.error("No se pudo generar el gráfico debido a un resultado de pronóstico no numérico.")
+
+    st.divider()
+    st.subheader("3. Empodérate con Conocimiento")
     with st.expander("🔗 Recursos Educativos y Sociedades Científicas"):
         st.markdown("""
-        * **[American Society for Reproductive Medicine (ASRM)](https://www.asrm.org/)**
-        * **[European Society of Human Reproduction and Embryology (ESHRE)](https://www.eshre.eu/)**
-        * **[Red Latinoamericana de Reproducción Asistida (REDLARA)](https://redlara.com/)**
+        La información es poder. Aquí tienes enlaces a las principales organizaciones de medicina reproductiva donde encontrarás guías, artículos y noticias de confianza.
+        * **[American Society for Reproductive Medicine (ASRM)](https://www.asrm.org/)**: Principal sociedad en Estados Unidos.
+        * **[European Society of Human Reproduction and Embryology (ESHRE)](https://www.eshre.eu/)**: Referente mundial y principal sociedad en Europa.
+        * **[Red Latinoamericana de Reproducción Asistida (REDLARA)](https://redlara.com/)**: La red más importante de centros de fertilidad en Latinoamérica.
         """)
-
-    # 🔥 --- 5. SECCIÓN PARA COMPARTIR (DEBE ESTAR AQUÍ DENTRO) ---
-    st.divider()
-    st.subheader("¡Comparte tu resultado!")
-    st.write("Descarga esta imagen de resumen para compartirla en tus redes sociales.")
-
-    image_data = create_sharable_image(evaluacion)
-
-    st.download_button(
-        label="📥 Descargar Imagen",
-        data=image_data,
-        file_name="mi_pronostico_fertilidad.png",
-        mime="image/png",
-        use_container_width=True
-    )
-
-    st.markdown("---")
-    st.subheader("Compartir en redes sociales")
-
-    mensaje_whatsapp = f"¡Mi pronóstico de fertilidad es {evaluacion.probabilidad_ajustada_final} ({evaluacion.pronostico_categoria})! 🍼 Calculado con FertiliCalc Pro. Haz tu test en: https://tuappfertilidad.com"
-    url_whatsapp = f"https://api.whatsapp.com/send?text={urllib.parse.quote(mensaje_whatsapp)}"
-    url_facebook = f"https://www.facebook.com/sharer/sharer.php?u={urllib.parse.quote('https://tuappfertilidad.com')}"
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown(f"""
-            <a href="{url_whatsapp}" target="_blank">
-                <img src="https://img.icons8.com/color/96/000000/whatsapp--v1.png" style="margin-right:10px;"/>
-            </a>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown(f"""
-            <a href="{url_facebook}" target="_blank">
-                <img src="https://img.icons8.com/color/96/000000/facebook-new.png" style="margin-right:10px;"/>
-            </a>
-        """, unsafe_allow_html=True)
-
-    st.info("💡 ¡Comparte para que más personas conozcan su probabilidad de embarazo!")

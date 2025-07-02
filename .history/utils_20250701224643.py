@@ -1,4 +1,4 @@
-# Actualización UX: mejora visual
+
 import streamlit as st
 
 def recopilar_datos_desde_ui():
@@ -68,7 +68,7 @@ import io
 
 def create_sharable_image(evaluacion, nombre="Mi FertiliTest"):
     """
-    Crea una imagen-resumen más atractiva y viralizable para redes sociales.
+    Crea una imagen-resumen atractiva y viralizable para redes sociales.
     """
     W, H = (1080, 1080)  # Formato cuadrado ideal para Instagram
     bg_color = "#1E2A47"  # Azul oscuro elegante

@@ -1,0 +1,7 @@
+[theme]
+base="light"  # Puedes cambiar a "dark" si quieres modo oscuro
+primaryColor="#00CC96"  # Color de botones y elementos activos
+backgroundColor="#f9f9f9"  # Color de fondo general
+secondaryBackgroundColor="#ffffff"  # Color de los contenedores
+textColor="#000000"  # Color del texto
+font="sans serif"  # Puedes cambiar a 'monospace' o 'serif' si quieres otro estilo

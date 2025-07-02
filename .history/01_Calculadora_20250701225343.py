@@ -11,10 +11,6 @@ from utils import recopilar_datos_desde_ui
 st.set_page_config(page_title="Calculadora de Fertilidad Pro", page_icon="👶", layout="wide")
 st.title("🎯 Calculadora Profesional de Fertilidad 👶")
 st.markdown("## Evalúa tu pronóstico de fertilidad de manera moderna, visual y personalizada.")
-# Selector de tema dinámico
-st.radio("Selecciona el tema de visualización:", ["light", "dark"], key="tema", horizontal=True)
-from ui_components import aplicar_tema_personalizado
-aplicar_tema_personalizado()
 
 
 # --- INICIO DE LA CORRECCIÓN DEFINITIVA: INICIALIZACIÓN DE ESTADO ---
