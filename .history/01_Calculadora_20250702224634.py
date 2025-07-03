@@ -51,7 +51,7 @@ if 'initialized' not in st.session_state:
     if 'tiene_otb' not in st.session_state: st.session_state.tiene_otb = False
     if 'tiene_hsg' not in st.session_state: st.session_state.tiene_hsg = False
     if 'resultado_hsg' not in st.session_state: st.session_state.resultado_hsg = "normal"
-   
+    if 'factor_tubario' not in st.session_state: st.session_state.factor_tubario = False
 
     # Laboratorio
     if 'use_amh' not in st.session_state: st.session_state.use_amh = False

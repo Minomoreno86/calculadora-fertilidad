@@ -408,38 +408,40 @@ def mostrar_informe_completo(evaluacion):
         * **[Red Latinoamericana de Reproducción Asistida (REDLARA)](https://redlara.com/)**
         """)
 
-    st.divider()
-    st.subheader("🔬 Recomendación de Técnicas de Reproducción Asistida")
+st.divider()
+st.subheader("🔬 Recomendación de Técnicas de Reproducción Asistida")
 
-  
-    # (código para mostrar el informe que ya tenías)
-    st.header("...")
-    
-    # El diccionario se crea aquí, cuando SÍ existe 'evaluacion'.
-    datos_reproduccion = {
-        'edad': evaluacion.edad,
-        'tiene_otb': evaluacion.tiene_otb,
-        'amh': evaluacion.amh,
-        'concentracion_esperm': evaluacion.concentracion_esperm,
-        'motilidad_progresiva': evaluacion.motilidad_progresiva,
-        'resultado_hsg': evaluacion.resultado_hsg,
-        'tiene_sop': evaluacion.tiene_sop
-    }
+# Extraemos los datos relevantes desde la evaluación actual
+datos_reproduccion = {
+    'edad': evaluacion.edad,
+    'tiene_otb': evaluacion.tiene_otb,
+    'concentracion_esperm': evaluacion.concentracion_esperm,
+    'motilidad_progresiva': evaluacion.motilidad_progresiva,
+    # (otros datos que ya pasabas)
 
-    # Llamas a la función de recomendaciones con el diccionario recién creado.
-    recomendaciones_repro, tecnica_sugerida = obtener_recomendaciones(datos_reproduccion)
-    
-    st.subheader("Tratamiento Sugerido")
-    st.success(f"**Técnica Recomendada:** {tecnica_sugerida}")
-    for rec in recomendaciones_repro:
-        st.write(rec)
-    # 🔥 --- 5. SECCIÓN PARA COMPARTIR (DEBE ESTAR AQUÍ DENTRO) ---
+    # --- ✅ AÑADE ESTA LÍNEA ---
+    'amh': evaluacion.amh
+}
+
+# Luego, cuando llamas a la función, ya tendrá el dato correcto.
+recomendaciones_repro, tecnica_sugerida = obtener_recomendaciones(datos_reproduccion)
+
+for recomendacion in recomendaciones_repro:
+    st.success(recomendacion)
+
+if tecnica_sugerida:
+    st.info(f"👉 Técnica prioritaria sugerida: **{tecnica_sugerida}**")
+
+st.caption("📚 Estas recomendaciones son orientativas y deben ser validadas con consulta médica especializada.")
+# 🔥 --- 5. SECCIÓN PARA COMPARTIR (DEBE ESTAR AQUÍ DENTRO) ---
+# 🔥 --- 5. SECCIÓN PARA COMPARTIR (DEBE ESTAR AQUÍ DENTRO) ---
+def mostrar_seccion_compartir(evaluacion):
     st.divider()
     st.subheader("¡Comparte tu resultado!")
     st.write("Descarga esta imagen de resumen para compartirla en tus redes sociales.")
 
     image_data = create_sharable_image(evaluacion)
-
+    
     st.download_button(
         label="📥 Descargar Imagen",
         data=image_data,
@@ -447,28 +449,28 @@ def mostrar_informe_completo(evaluacion):
         mime="image/png",
         use_container_width=True
     )
-
+    
     st.markdown("---")
     st.subheader("Compartir en redes sociales")
-
+    
     mensaje_whatsapp = f"¡Mi pronóstico de fertilidad es {evaluacion.probabilidad_ajustada_final} ({evaluacion.pronostico_categoria})! 🍼 Calculado con FertiliCalc Pro. Haz tu test en: https://tuappfertilidad.com"
     url_whatsapp = f"https://api.whatsapp.com/send?text={urllib.parse.quote(mensaje_whatsapp)}"
     url_facebook = f"https://www.facebook.com/sharer/sharer.php?u={urllib.parse.quote('https://tuappfertilidad.com')}"
-
+    
     col1, col2 = st.columns(2)
-
+    
     with col1:
         st.markdown(f"""
             <a href="{url_whatsapp}" target="_blank">
                 <img src="https://img.icons8.com/color/96/000000/whatsapp--v1.png" style="margin-right:10px;"/>
             </a>
         """, unsafe_allow_html=True)
-
+    
     with col2:
         st.markdown(f"""
             <a href="{url_facebook}" target="_blank">
                 <img src="https://img.icons8.com/color/96/000000/facebook-new.png" style="margin-right:10px;"/>
             </a>
         """, unsafe_allow_html=True)
-
+    
     st.info("💡 ¡Comparte para que más personas conozcan su probabilidad de embarazo!")

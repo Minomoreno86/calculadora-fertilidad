@@ -16,7 +16,7 @@ def recopilar_datos_desde_ui():
 
     # --- Historial Clínico ---
     datos['tiene_sop'] = st.session_state.get('tiene_sop', False)
-    
+
     if st.session_state.get('tiene_endometriosis', False):
         datos['grado_endometriosis'] = st.session_state.get('grado_endometriosis', 1)
     else:
@@ -45,8 +45,9 @@ def recopilar_datos_desde_ui():
         datos['resultado_hsg'] = st.session_state.get('resultado_hsg', 'normal')
     else:
         datos['resultado_hsg'] = None # None si no hay datos
-    datos['tiene_otb'] = st.session_state.get('tiene_otb', False)
-    
+        
+        datos['tiene_otb'] = True if st.session_state.get('tiene_otb', '') == "Sí" else False
+
 
     # --- Laboratorio ---
     datos['amh'] = st.session_state.get('amh') if st.session_state.get('use_amh') else None

@@ -186,12 +186,10 @@ class EvaluacionFertilidad:
         elif self.resultado_hsg == "defecto_uterino": self.comentario_hsg, self.hsg_factor = "Alteración cavidad uterina", 0.3
 
     def _evaluar_otb(self):
-        """
-        Método simplificado. Solo ajusta el factor de OTB para anular el pronóstico.
-        La lógica de recomendación se mueve a 'obtener_recomendaciones'.
-        """
+        """✅ MEJORA: Lógica de OTB corregida para usar un factor."""
         if self.tiene_otb:
             self.otb_factor = 0.0
+
     def _evaluar_amh(self):
         if self.amh is None: self.datos_faltantes.append("Hormona Antimülleriana (AMH)"); return
         if self.amh > 4.0: self.diagnostico_reserva, self.amh_factor = "Alta (sugestivo de SOP)", 0.9
@@ -232,22 +230,15 @@ class EvaluacionFertilidad:
 
     def _generar_textos_pronostico(self):
         """Genera los textos principales del pronóstico, con manejo especial para OTB."""
+        # ✅ MEJORA: Caso especial para OTB que anula otros pronósticos.
         if self.otb_factor == 0.0:
-            self.pronostico_categoria = "REQUIERE TRATAMIENTO"
-            self.pronostico_emoji = "🔴"
-            self.pronostico_frase = (
-                "El embarazo espontáneo no es posible debido a la ligadura de trompas (OTB). "
-                "Consulta la sección de recomendaciones para ver el tratamiento sugerido en tu caso."
-            )
+            self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "NULO POR OTB", "🔴", "El pronóstico de embarazo espontáneo es nulo debido a una ligadura tubárica (OTB) confirmada. Se requiere Fecundación In Vitro (FIV)."
             return
             
         pronostico_str = self.probabilidad_ajustada_final 
-        if self.pronostico_numerico >= 15:
-            self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "BUENO", "🟢", f"¡Tu pronóstico de concepción espontánea por ciclo es BUENO ({pronostico_str})!"
-        elif self.pronostico_numerico >= 5:
-            self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "MODERADO", "🟡", f"Tu pronóstico es MODERADO ({pronostico_str}). Hay factores que se pueden optimizar."
-        else:
-            self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "BAJO", "🔴", f"Tu pronóstico es BAJO ({pronostico_str}). Se recomienda una evaluación por un especialista."
+        if self.pronostico_numerico >= 15: self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "BUENO", "🟢", f"¡Tu pronóstico de concepción espontánea por ciclo es BUENO ({pronostico_str})!"
+        elif self.pronostico_numerico >= 5: self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "MODERADO", "🟡", f"Tu pronóstico es MODERADO ({pronostico_str}). Hay factores que se pueden optimizar."
+        else: self.pronostico_categoria, self.pronostico_emoji, self.pronostico_frase = "BAJO", "🔴", f"Tu pronóstico es BAJO ({pronostico_str}). Se recomienda una evaluación por un especialista."
 
     def _generar_comparativa_benchmark(self):
         if self.otb_factor == 0.0: self.benchmark_frase = "No aplica por OTB."; return

@@ -45,7 +45,7 @@ def recopilar_datos_desde_ui():
         datos['resultado_hsg'] = st.session_state.get('resultado_hsg', 'normal')
     else:
         datos['resultado_hsg'] = None # None si no hay datos
-    datos['tiene_otb'] = st.session_state.get('tiene_otb', False)
+    'tiene_otb': st.session_state.get('tiene_otb', False),
     
 
     # --- Laboratorio ---

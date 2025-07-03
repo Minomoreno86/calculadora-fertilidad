@@ -48,10 +48,10 @@ if 'initialized' not in st.session_state:
     if 'mioma_subseroso_grande' not in st.session_state: st.session_state.mioma_subseroso_grande = False
     if 'tiene_adenomiosis_check' not in st.session_state: st.session_state.tiene_adenomiosis_check = False
     if 'tipo_adenomiosis' not in st.session_state: st.session_state.tipo_adenomiosis = "focal"
-    if 'tiene_otb' not in st.session_state: st.session_state.tiene_otb = False
+    if 'tiene_otb' not in st.session_state: st.session_state.tiene_otb = "No"
     if 'tiene_hsg' not in st.session_state: st.session_state.tiene_hsg = False
     if 'resultado_hsg' not in st.session_state: st.session_state.resultado_hsg = "normal"
-   
+    if 'factor_tubario' not in st.session_state: st.session_state.factor_tubario = False
 
     # Laboratorio
     if 'use_amh' not in st.session_state: st.session_state.use_amh = False

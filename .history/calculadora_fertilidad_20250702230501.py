@@ -187,11 +187,28 @@ class EvaluacionFertilidad:
 
     def _evaluar_otb(self):
         """
-        Método simplificado. Solo ajusta el factor de OTB para anular el pronóstico.
-        La lógica de recomendación se mueve a 'obtener_recomendaciones'.
+        Evalúa el caso de OTB (ligadura de trompas), anula el pronóstico de embarazo
+        natural y recomienda el tratamiento más adecuado según edad y reserva ovárica.
         """
         if self.tiene_otb:
+            # Anula el pronóstico de embarazo espontáneo
             self.otb_factor = 0.0
+            
+            # Lógica para decidir entre Recanalización o FIV
+            # Se asume que RECOMENDACIONES tiene las claves "OTB_RECANALIZACION" y "OTB_FIV"
+            if self.edad < 35 and self.amh is not None and self.amh > 1.0:
+                recomendacion_otb = RECOMENDACIONES.get(
+                    "OTB_RECANALIZACION", 
+                    "Por tu edad y buena reserva ovárica, la Recanalización de Trompas es una opción viable para restaurar la fertilidad natural."
+                )
+                self.recomendaciones_lista.append(recomendacion_otb)
+            else:
+                recomendacion_otb = RECOMENDACIONES.get(
+                    "OTB_FIV",
+                    "Debido a la edad o la reserva ovárica, la Fecundación In Vitro (FIV) es el tratamiento recomendado para lograr el embarazo, ya que no requiere el uso de las trompas."
+                )
+                self.recomendaciones_lista.append(recomendacion_otb)
+
     def _evaluar_amh(self):
         if self.amh is None: self.datos_faltantes.append("Hormona Antimülleriana (AMH)"); return
         if self.amh > 4.0: self.diagnostico_reserva, self.amh_factor = "Alta (sugestivo de SOP)", 0.9

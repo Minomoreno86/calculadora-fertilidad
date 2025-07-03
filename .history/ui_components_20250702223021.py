@@ -196,9 +196,11 @@ def ui_historial_clinico():
     st.divider()
 
     # --- Ligadura de Trompas (OTB) con selectbox ---
-     # --- Ligadura de Trompas (OTB) con selectbox ---
-    tiene_otb = st.toggle("¿La paciente tiene OTB (ligadura de trompas)?", key="tiene_otb")
-
+    tiene_otb = st.selectbox(
+        "¿La paciente tiene OTB (ligadura de trompas)?",
+        options=["No", "Sí"],
+        key="tiene_otb"
+    )
 
     # --- Resultado de HSG con selectbox ---
     tiene_hsg = st.toggle("¿Tiene resultado de Histerosalpingografía (HSG)?", key="tiene_hsg")
@@ -411,28 +413,29 @@ def mostrar_informe_completo(evaluacion):
     st.divider()
     st.subheader("🔬 Recomendación de Técnicas de Reproducción Asistida")
 
-  
-    # (código para mostrar el informe que ya tenías)
-    st.header("...")
-    
-    # El diccionario se crea aquí, cuando SÍ existe 'evaluacion'.
+    # Extraemos los datos relevantes desde la evaluación actual
     datos_reproduccion = {
-        'edad': evaluacion.edad,
-        'tiene_otb': evaluacion.tiene_otb,
-        'amh': evaluacion.amh,
-        'concentracion_esperm': evaluacion.concentracion_esperm,
-        'motilidad_progresiva': evaluacion.motilidad_progresiva,
-        'resultado_hsg': evaluacion.resultado_hsg,
-        'tiene_sop': evaluacion.tiene_sop
-    }
-
-    # Llamas a la función de recomendaciones con el diccionario recién creado.
-    recomendaciones_repro, tecnica_sugerida = obtener_recomendaciones(datos_reproduccion)
+    'edad': evaluacion.edad,
+    'tiene_sop': evaluacion.tiene_sop,
+    'trompas_permeables': st.session_state.get('trompas_permeables', True),
+    'factor_tubario': evaluacion.factor_tubario,
     
-    st.subheader("Tratamiento Sugerido")
-    st.success(f"**Técnica Recomendada:** {tecnica_sugerida}")
-    for rec in recomendaciones_repro:
-        st.write(rec)
+    'recanalizacion_trompas': st.session_state.get('recanalizacion_trompas', False),
+    'baja_reserva': evaluacion.baja_reserva,
+    'fallo_ovario': evaluacion.fallo_ovario,
+    'concentracion': evaluacion.concentracion_esperm,
+    'motilidad': evaluacion.motilidad_progresiva
+}
+
+    recomendaciones_repro, tecnica_sugerida = obtener_recomendaciones(datos_reproduccion)
+
+    for recomendacion in recomendaciones_repro:
+        st.success(recomendacion)
+
+    if tecnica_sugerida:
+        st.info(f"👉 Técnica prioritaria sugerida: **{tecnica_sugerida}**")
+
+    st.caption("📚 Estas recomendaciones son orientativas y deben ser validadas con consulta médica especializada.")
     # 🔥 --- 5. SECCIÓN PARA COMPARTIR (DEBE ESTAR AQUÍ DENTRO) ---
     st.divider()
     st.subheader("¡Comparte tu resultado!")

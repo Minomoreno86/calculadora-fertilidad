@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from recomendaciones_reproduccion import obtener_recomendaciones
 
 
 # --- IMPORTACIÓN CLAVE QUE RESUELVE EL ERROR ---
@@ -144,10 +143,7 @@ def ui_perfil_basico():
 def ui_historial_clinico():
     """
     Dibuja la interfaz de usuario para el Historial Clínico con UX mejorada y opciones completas.
-    Incluye selectbox como el resto de los controles para OTB y HSG.
     """
-    import streamlit as st
-
     st.markdown("#### Paso 2 de 4: Historial Clínico y Anatómico")
     st.write("Selecciona solo las condiciones que han sido diagnosticadas por un médico.")
     st.divider()
@@ -155,7 +151,7 @@ def ui_historial_clinico():
     col1, col2 = st.columns(2)
 
     with col1:
-        # --- SOP ---
+        # --- SOP (Síndrome de Ovario Poliquístico) ---
         tiene_sop = st.toggle("Diagnóstico de SOP", key="tiene_sop")
         if tiene_sop:
             st.info("💡 El SOP puede afectar la regularidad de la ovulación.")
@@ -178,45 +174,32 @@ def ui_historial_clinico():
             )
 
     with col2:
-        # --- Miomas ---
+        # --- Miomatosis Uterina ---
         tiene_miomas = st.toggle("Diagnóstico de Miomatosis (Fibromas)", key="tiene_miomas")
         if tiene_miomas:
             st.info("💡 La localización y tamaño de los miomas es crucial.")
-            st.checkbox("¿Son SUBMUCOSOS (dentro de la cavidad)?", key="mioma_submucoso")
-            st.checkbox("¿Son SUBMUCOSOS y MÚLTIPLES?", key="mioma_submucoso_multiple")
+            submucoso_check = st.checkbox("¿Son SUBMUCOSOS (dentro de la cavidad)?", key="mioma_submucoso")
+            if submucoso_check:
+                st.checkbox("...y son MÚLTIPLES?", key="mioma_submucoso_multiple")
             st.checkbox("¿Son INTRAMURALES y deforman cavidad o >4cm?", key="mioma_intramural_significativo")
             st.checkbox("¿Son SUBSEROSOS y miden >6cm?", key="mioma_subseroso_grande")
 
-        # --- Adenomiosis ---
+        # --- Adenomiosis (SECCIÓN RESTAURADA) ---
         tiene_adenomiosis = st.toggle("Diagnóstico de Adenomiosis", key="tiene_adenomiosis_check")
         if tiene_adenomiosis:
             st.info("💡 La adenomiosis ocurre cuando el tejido endometrial crece en la pared muscular del útero.")
             st.selectbox("Tipo de Adenomiosis", options=["focal", "difusa"], key="tipo_adenomiosis", format_func=lambda x: x.capitalize())
 
-    st.divider()
-
-    # --- Ligadura de Trompas (OTB) con selectbox ---
-     # --- Ligadura de Trompas (OTB) con selectbox ---
-    tiene_otb = st.toggle("¿La paciente tiene OTB (ligadura de trompas)?", key="tiene_otb")
-
-
-    # --- Resultado de HSG con selectbox ---
-    tiene_hsg = st.toggle("¿Tiene resultado de Histerosalpingografía (HSG)?", key="tiene_hsg")
-    if tiene_hsg:
-        st.info("💡 La HSG evalúa si las trompas de Falopio están abiertas.")
-        st.selectbox(
-            "Resultado de la HSG",
-            options=["normal", "unilateral", "bilateral", "defecto_uterino"],
-            key="resultado_hsg",
-            format_func=lambda x: {
-                "normal": "Normal (Ambas trompas permeables)",
-                "unilateral": "Obstrucción Unilateral",
-                "bilateral": "Obstrucción Bilateral",
-                "defecto_uterino": "Defecto en la cavidad uterina"
-            }.get(x, "Selecciona un resultado")
-        )
-
-    
+        # --- Factor Tubárico (HSG) ---
+        tiene_hsg = st.toggle("Tienes resultado de Histerosalpingografía (HSG)", key="tiene_hsg")
+        if tiene_hsg:
+            st.info("💡 La HSG evalúa si las trompas de Falopio están abiertas.")
+            st.selectbox(
+                "Resultado de la HSG",
+                options=["normal", "unilateral", "bilateral", "defecto_uterino"],
+                key="resultado_hsg",
+                format_func=lambda x: {"normal": "Normal (Ambas trompas permeables)", "unilateral": "Obstrucción Unilateral", "bilateral": "Obstrucción Bilateral", "defecto_uterino": "Defecto en la cavidad uterina"}.get(x) if x else "Selecciona un resultado"
+            )
 def ui_laboratorio():
     """
     Dibuja la interfaz para el Perfil de Laboratorio con UX mejorada y validación inmediata.
@@ -338,7 +321,6 @@ def display_main_score(value):
         st.progress(value / 25)
         st.write(f"**Evaluación:** Un pronóstico considerado **{performance_text}**.")
 
-
 def mostrar_informe_completo(evaluacion):
     # --- 1. Marcador Visual Principal ---
     display_main_score(evaluacion.pronostico_numerico)
@@ -411,28 +393,31 @@ def mostrar_informe_completo(evaluacion):
     st.divider()
     st.subheader("🔬 Recomendación de Técnicas de Reproducción Asistida")
 
-  
-    # (código para mostrar el informe que ya tenías)
-    st.header("...")
-    
-    # El diccionario se crea aquí, cuando SÍ existe 'evaluacion'.
+    # Extraemos los datos relevantes desde la evaluación actual
     datos_reproduccion = {
         'edad': evaluacion.edad,
-        'tiene_otb': evaluacion.tiene_otb,
-        'amh': evaluacion.amh,
-        'concentracion_esperm': evaluacion.concentracion_esperm,
-        'motilidad_progresiva': evaluacion.motilidad_progresiva,
-        'resultado_hsg': evaluacion.resultado_hsg,
-        'tiene_sop': evaluacion.tiene_sop
+        'abortos_previos': evaluacion.abortos_previos,
+        'tiene_sop': evaluacion.tiene_sop,
+        'trompas_permeables': st.session_state.get('trompas_permeables', True),
+        'rem_suficiente': st.session_state.get('rem_suficiente', True),
+        'factor_masculino_leve': evaluacion.factor_masculino_leve,
+        'factor_masculino_severo': evaluacion.factor_masculino_severo,
+        'factor_tubario': evaluacion.factor_tubario,
+        'iod': evaluacion.infertilidad_origen_desconocido,
+        'recanalizacion_trompas': st.session_state.get('recanalizacion_trompas', False),
+        'baja_reserva': evaluacion.baja_reserva,
+        'fallo_ovario': evaluacion.fallo_ovario
     }
 
-    # Llamas a la función de recomendaciones con el diccionario recién creado.
     recomendaciones_repro, tecnica_sugerida = obtener_recomendaciones(datos_reproduccion)
-    
-    st.subheader("Tratamiento Sugerido")
-    st.success(f"**Técnica Recomendada:** {tecnica_sugerida}")
-    for rec in recomendaciones_repro:
-        st.write(rec)
+
+    for recomendacion in recomendaciones_repro:
+        st.success(recomendacion)
+
+    if tecnica_sugerida:
+        st.info(f"👉 Técnica prioritaria sugerida: **{tecnica_sugerida}**")
+
+    st.caption("📚 Estas recomendaciones son orientativas y deben ser validadas con consulta médica especializada.")
     # 🔥 --- 5. SECCIÓN PARA COMPARTIR (DEBE ESTAR AQUÍ DENTRO) ---
     st.divider()
     st.subheader("¡Comparte tu resultado!")
