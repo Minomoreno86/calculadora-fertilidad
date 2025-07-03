@@ -1,0 +1,7 @@
+# En: components/report_widgets/__init__.py
+from .pronostico_card import render_pronostico_card
+from .benchmark_card import render_benchmark_card
+from .factores_card import render_factores_card 
+from .recommendations_widget import render_recommendations_widget
+from .art_widget import render_art_recommendation
+from .sharing_widget import render_sharing_buttons
