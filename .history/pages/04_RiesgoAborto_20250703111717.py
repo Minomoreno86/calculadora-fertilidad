@@ -223,31 +223,18 @@ if st.button("Guardar Evaluación de Riesgo"):
         conn = crear_conexion_y_tablas("fertilidad.db")
         if conn is not None:
             try:
-                # ✅ CORRECCIÓN: Construimos la tupla de forma segura y completa
                 datos_registro = (
                     datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    datos.get('edad'),
-                    datos.get('imc'),
-                    datos.get('abortos_previos'),
-                    # Convertimos los booleanos de los toggles a 1 o 0
-                    int(datos.get('cirugias_uterinas', False)), # Asumo que 'tiene_miomas' no está en la UI, sino cirugías.
-                    int(datos.get('malformaciones', False)),   # Asumo que 'tiene_adenomiosis' no está en la UI.
-                    int(datos.get('tiene_sop', False)),         # Este sí está en la UI, pero lo obtenemos de 'datos'
-                    int(datos.get('diabetes', False)),
-                    int(datos.get('hipotiroidismo', False)),
-                    int(datos.get('trombofilias', False)),      # Prolactina alta no es un toggle, sino una condición.
-                    int(datos.get('torch', False) or datos.get('listeria_sifilis', False)), # Infecciones
-                    int(datos.get('cromosomicas', False) or datos.get('translocaciones', False)), # Calidad Semen/Genética
-                    resultado['riesgo_final'],
-                    resultado['categoria']
+                    datos['edad'], datos['imc'], datos['abortos_previos'], int(datos['tiene_miomas']) if 'tiene_miomas' in datos else 0,
+                    int(datos['malformaciones']), int(datos['trombofilias']), int(datos['diabetes']), int(datos['hipotiroidismo']),
+                    int(datos['trombofilias']), int(datos['inmunologicas']), int(datos['autoinmunes']),
+                    resultado['riesgo_final'], resultado['categoria']
                 )
-                
                 insertar_riesgo_aborto(conn, datos_registro)
                 st.toast('¡Evaluación guardada con éxito!', icon='✅')
+                conn.close()
             except Exception as e:
                 st.error(f"Error al guardar: {e}")
-            finally:
-                # Nos aseguramos de cerrar la conexión
                 conn.close()
     else:
         st.warning("⚠️ Primero debes calcular el riesgo antes de poder guardarlo.")

@@ -26,7 +26,7 @@ conn = crear_conexion_y_tablas(DB_FILE)
 
 if conn is not None:
     df_registros = leer_todos_los_registros(conn)
-    
+    conn.close() # <--- ❌ ELIMINA ESTA LÍNEA
 else:
     # Si la conexión falla, muestra un error y detiene la ejecución
     st.error("No se pudo conectar a la base de datos.")

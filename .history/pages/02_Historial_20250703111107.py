@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from database import (
-    crear_conexion_y_tablas, 
+    crear_conexion, 
     leer_todos_los_registros, 
     leer_todos_los_riesgos,
     eliminar_registro_por_id, 
@@ -24,7 +24,7 @@ st.write("Aquí puedes ver y gestionar todos los perfiles y resultados que has g
 
 # --- ✅ MEJORA: Gestión centralizada de la conexión a la BD ---
 DB_FILE = "fertilidad.db"
-conn = crear_conexion_y_tablas(DB_FILE)
+conn = crear_conexion(DB_FILE)
 
 def mostrar_pagina_historial(db_connection):
     """Función principal para renderizar toda la página del historial."""

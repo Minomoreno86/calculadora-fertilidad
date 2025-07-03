@@ -1,17 +1,15 @@
-# En: pages/03_Simulador.py
+# pages/03_Simulador.py
+# CÓDIGO COMPLETO Y SINCRONIZADO CON LA ÚLTIMA VERSIÓN DE LA CLASE
 
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
-from datetime import datetime
-
-# ✅ Importaciones corregidas desde nuestros paquetes
-from database import crear_conexion_y_tablas, leer_todos_los_registros, desbloquear_logro, insertar_registro
-from models import EvaluacionFertilidad
-from engine import ejecutar_evaluacion_completa
+from database import crear_conexion, leer_todos_los_registros
+from engine import EvaluacionFertilidad
 from config import SIMULATABLE_VARIABLES
 from utils import aplicar_tema_personalizado
+aplicar_tema_personalizado()
+
     
 st.set_page_config(page_title="Simulador de Escenarios", page_icon="🧪", layout="wide")
 st.title("🧪 Simulador de Escenarios: ¿Qué Pasa Si...?")
@@ -20,15 +18,13 @@ st.write(
 )
 
 # --- 1. Carga de Datos ---
-# --- 1. Carga de Datos ---
 DB_FILE = "fertilidad.db"
-conn = crear_conexion_y_tablas(DB_FILE)
+conn = crear_conexion(DB_FILE)
 
 if conn is not None:
     df_registros = leer_todos_los_registros(conn)
-    
+    conn.close()
 else:
-    # Si la conexión falla, muestra un error y detiene la ejecución
     st.error("No se pudo conectar a la base de datos.")
     st.stop()
 
@@ -127,13 +123,10 @@ datos_simulados.pop('id', None)
 datos_simulados.pop('timestamp', None)
 datos_simulados.pop('pronostico_final', None)
 
-# ...
-# 1. Se crea el objeto contenedor de datos
+# 1. Creamos la instancia del modelo.
 evaluacion_simulada = EvaluacionFertilidad(**datos_simulados)
-
-# 2. Se le pasa el objeto al "motor" para que lo procese y rellene
-ejecutar_evaluacion_completa(evaluacion_simulada) # <-- ✅ ESTA ES LA NUEVA FORMA
-# ...
+# 2. Le pedimos al modelo que ejecute su lógica interna.
+evaluacion_simulada.ejecutar_evaluacion()
 
 # 3. Obtenemos los atributos correctos que el "contrato" de la clase nos ofrece.
 pronostico_simulado_num = evaluacion_simulada.pronostico_numerico
@@ -148,8 +141,11 @@ with col2:
     delta=f"{pronostico_simulado_num - perfil_base['pronostico_final']:.1f}% vs. Original"
 )
 # 👇 Desbloquear logro al hacer simulación
+conn = crear_conexion(DB_FILE)
 if conn is not None:
+    from database import desbloquear_logro
     desbloquear_logro(conn, "Explorador")
+    conn.close()
     st.toast('¡Logro desbloqueado: Explorador!', icon='🎖️')
 # --- COMPARACIÓN GRÁFICA DEL PRONÓSTICO ORIGINAL VS. SIMULADO CON ETIQUETAS ---
 st.divider()
@@ -208,11 +204,11 @@ st.divider()
 st.subheader("💾 Guardar Escenario Simulado")
 
 if st.button("Guardar este Escenario Simulado como Nuevo Perfil"):
-    from database import crear_conexion_y_tablas, insertar_registro
+    from database import crear_conexion, insertar_registro
     from datetime import datetime
 
     DB_FILE = "fertilidad.db"
-    conn = crear_conexion_y_tablas(DB_FILE)
+    conn = crear_conexion(DB_FILE)
 
     if conn is not None:
         try:

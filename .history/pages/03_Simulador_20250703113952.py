@@ -20,15 +20,13 @@ st.write(
 )
 
 # --- 1. Carga de Datos ---
-# --- 1. Carga de Datos ---
 DB_FILE = "fertilidad.db"
 conn = crear_conexion_y_tablas(DB_FILE)
 
 if conn is not None:
     df_registros = leer_todos_los_registros(conn)
-    
+    conn.close()
 else:
-    # Si la conexión falla, muestra un error y detiene la ejecución
     st.error("No se pudo conectar a la base de datos.")
     st.stop()
 

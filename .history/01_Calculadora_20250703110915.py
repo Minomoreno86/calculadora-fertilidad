@@ -6,7 +6,7 @@ from datetime import datetime
 from models import EvaluacionFertilidad
 from engine import ejecutar_evaluacion_completa  # <-- Importar la nueva función
 from components import ui_perfil_basico, ui_historial_clinico, ui_laboratorio, ui_factor_masculino, mostrar_informe_completo
-from database import crear_conexion_y_tablas, insertar_registro, preparar_registro_db, desbloquear_logro, obtener_logros
+from database import crear_conexion, insertar_registro, preparar_registro_db, desbloquear_logro, obtener_logros
 from utils import recopilar_datos_desde_ui, aplicar_tema_personalizado
 
 # --- Configuración de la Página ---
@@ -121,7 +121,7 @@ if 'evaluacion_actual' in st.session_state and st.session_state.evaluacion_actua
 # Lógica del botón de guardar
 if st.button("💾 Guardar este Perfil y Resultado", use_container_width=True, key="guardar_informe"):
     if st.session_state.evaluacion_actual is not None:
-        conn = crear_conexion_y_tablas("fertilidad.db")
+        conn = crear_conexion("fertilidad.db")
         if conn is not None:
             try:
                 registro_db = preparar_registro_db(st.session_state.evaluacion_actual)
@@ -142,7 +142,7 @@ if st.button("💾 Guardar este Perfil y Resultado", use_container_width=True, k
     st.divider()
 st.subheader("🏅 Tus Logros")
 
-conn = crear_conexion_y_tablas("fertilidad.db")
+conn = crear_conexion("fertilidad.db")
 if conn is not None:
     df_logros = obtener_logros(conn)
     for index, row in df_logros.iterrows():
