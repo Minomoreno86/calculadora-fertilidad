@@ -1,7 +1,7 @@
 # 01_Calculadora.py
 import streamlit as st
 from datetime import datetime
-from engine import EvaluacionFertilidad
+from calculadora_fertilidad import EvaluacionFertilidad
 from ui_components import ui_perfil_basico, ui_historial_clinico, ui_laboratorio, ui_factor_masculino, mostrar_informe_completo
 from db_manager import crear_conexion, insertar_registro
 

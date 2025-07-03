@@ -1,14 +1,32 @@
+import sys
+import os
 
+# --- ✅ AÑADE ESTE BLOQUE DE CÓDIGO AL INICIO DE TODO ---
+# Esto añade la carpeta raíz del proyecto al 'path' de Python
+# para que pueda encontrar los paquetes 'logic', 'models', 'components', etc.
+project_root = os.path.dirname(os.path.abspath(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 import streamlit as st
 from datetime import datetime
 
-# --- ✅ PASO 1: CORREGIR LOS IMPORTS ---
-from models import EvaluacionFertilidad
-from engine import ejecutar_evaluacion_completa  # <-- Importar la nueva función
+# --- Módulos del Proyecto ---
+from models import EvaluacionFertilidad # Importa la clase desde models.py
+from engine import EvaluacionFertilidad
 from components import ui_perfil_basico, ui_historial_clinico, ui_laboratorio, ui_factor_masculino, mostrar_informe_completo
 from db_manager import crear_conexion, insertar_registro, preparar_registro_db, desbloquear_logro, obtener_logros
-from utils import recopilar_datos_desde_ui, aplicar_tema_personalizado
+from utils import recopilar_datos_desde_ui
 
+# ...
+if st.button("Generar Informe..."):
+    with st.spinner(...):
+        datos = recopilar_datos_desde_ui()
+        # 1. Crea un objeto vacío
+        evaluacion_actual = EvaluacionFertilidad(**datos)
+        # 2. Se lo pasa al motor para que lo "rellene"
+        evaluacion_actual.ejecutar_evaluacion()
+        st.session_state.evaluacion_actual = evaluacion_actual
+# ...
 # --- Configuración de la Página ---
 st.set_page_config(page_title="Calculadora de Fertilidad Pro", page_icon="👶", layout="wide")
 st.title("🎯 Calculadora Profesional de Fertilidad 👶")
@@ -91,22 +109,16 @@ with tab4:
 
 st.divider()
 
-
 # --- Lógica de Generación de Informe ---
 if st.button("Generar Informe de Fertilidad Completo", type="primary", use_container_width=True, key="generar_informe"):
     
+    # --- INICIO DE LA MODIFICACIÓN ---
     with st.spinner('Analizando factores y calculando pronóstico... 🧠'):
         try:
+            # Toda la lógica que ya teníamos va indentada dentro del spinner
             datos_para_evaluacion = recopilar_datos_desde_ui()
-            
-            # --- ✅ PASO 2: CORREGIR LA LLAMADA A LA LÓGICA ---
-            
-            # 1. Se crea el objeto contenedor de datos
             evaluacion = EvaluacionFertilidad(**datos_para_evaluacion)
-            
-            # 2. Se le pasa el objeto al "motor" para que lo procese
-            ejecutar_evaluacion_completa(evaluacion)
-            
+            evaluacion.ejecutar_evaluacion()
             st.session_state.evaluacion_actual = evaluacion
 
         except Exception as e:

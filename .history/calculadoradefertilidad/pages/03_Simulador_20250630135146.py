@@ -5,7 +5,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from db_manager import crear_conexion, leer_todos_los_registros
-from engine import EvaluacionFertilidad
+from calculadora_fertilidad import EvaluacionFertilidad
 from config import SIMULATABLE_VARIABLES
 
 st.set_page_config(page_title="Simulador de Escenarios", page_icon="🧪", layout="wide")
